@@ -8,7 +8,11 @@
 '''''''''
 import numpy as np
 import sympy
+import copy
 
+################################################
+####         Solve nonlinear equations
+################################################
 '''''''''
 Newton's iteration method is used to find the root of f(x)=0
 coeffs: 
@@ -118,7 +122,36 @@ def secantMethod(start_point1, start_point2, var, f, epoch = 0, TOL = -1):
             if count > 1000:
                 print("It have iterated over 1000 epoches.\n\r You may need to check the params.\n")
     return x
-    
+
+################################################
+####                  IVP
+################################################
+'''''''''
+Trapezoidal Method is used to solve the Inital value problem
+It is an implicit method using Newton Method.
+coeffs: 
+    - func         - dy/dx = func
+    - step         - iteration step
+    - start_point  - x interval left side
+    - final_point  - x interval right side
+    - y0           - initial value y(0)
+returns:
+    - y_list       - list of approximate values evaluated at each step
+'''''''''
+def myTrapezoidalIVP(func, step, start_point, final_point, y0):
+    n = round((final_point - start_point)/step)
+    x_list = list(start_point+step*i for i in range(n+1))
+    y_list = [y0]
+    y = sympy.symbols("y")
+    for i in range(n):
+        f = y - (y_list[i] + 0.5*step*(func(x_list[i],y_list[i])+func(x_list[i+1],y)))
+        y_next = newtonMethod(0,y,f,TOL=1e-2)
+        if y_next == None:
+            break
+        else:
+            y_list.append(y_next)
+    return y_list    
+
 '''''''''
 Euler Backward Method is used to solve the Inital value problem
 It is an implicit method using Newton Method. It is more accurate but cost more time.
@@ -131,7 +164,6 @@ coeffs:
 returns:
     - y_list       - list of approximate values evaluated at each step
 '''''''''
-
 def eulerBackwardIVP(func, step, start_point, final_point, y0):
     n = round((final_point - start_point)/step)
     x_list = list(start_point+step*i for i in range(n+1))
@@ -145,6 +177,7 @@ def eulerBackwardIVP(func, step, start_point, final_point, y0):
         else:
             y_list.append(y_next)
     return y_list
+
 '''''''''
 Euler Method is used to solve the Inital value problem
 It is an explicit method with lower accuracy.
@@ -163,5 +196,55 @@ def eulerMethodIVP(func, step, start_point, final_point, y0):
     y_list = [y0]
     for i in range(n):
         y_next = y_list[i] + step*func(x_list[i], y_list[i])
+        y_list.append(y_next)
+    return y_list
+    
+'''''''''
+2nd order Runge-Kutta Method is used to solve the Inital value problem
+It is an explicit method with o(3) accuracy.
+A.K.A Heun Method
+coeffs: 
+    - func         - dy/dx = func
+    - step         - iteration step
+    - start_point  - x interval left side
+    - final_point  - x interval right side
+    - y0           - initial value y(0)
+returns:
+    - y_list       - list of approximate values evaluated at each step
+'''''''''
+def rk2IVP(func, step, start_point, final_point, y0):
+    n = round((final_point - start_point)/step)
+    x_list = list(start_point+step*i for i in range(n+1))
+    y_list = [y0]
+    for i in range(n):
+        K1 = func(x_list[i],y_list[i])
+        K2 = func(x_list[i]+step, y_list[i]+step*K1)
+        y_next = y_list[i] + 0.5*step*(K1+K2)
+        y_list.append(y_next)
+    return y_list
+
+'''''''''
+4th order Runge-Kutta Method is used to solve the Inital value problem
+It is an explicit method with o(5) accuracy.
+A.K.A Heun Method
+coeffs: 
+    - func         - dy/dx = func
+    - step         - iteration step
+    - start_point  - x interval left side
+    - final_point  - x interval right side
+    - y0           - initial value y(0)
+returns:
+    - y_list       - list of approximate values evaluated at each step
+'''''''''
+def rk4IVP(func, step, start_point, final_point, y0):
+    n = round((final_point - start_point)/step)
+    x_list = list(start_point+step*i for i in range(n+1))
+    y_list = [y0]
+    for i in range(n):
+        K1 = func(x_list[i],y_list[i])
+        K2 = func(x_list[i]+0.5*step, y_list[i]+0.5*step*K1)
+        K3 = func(x_list[i]+0.5*step, y_list[i]+0.5*step*K2)
+        K4 = func(x_list[i]+step, y_list[i]+step*K3)
+        y_next = y_list[i] + step*(K1+2*K2+2*K3+K4)/6
         y_list.append(y_next)
     return y_list

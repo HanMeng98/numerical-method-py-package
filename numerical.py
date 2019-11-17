@@ -4,7 +4,7 @@
 @contact: HanMeng98@outlook.com
 @file: numerical.py 
 @time: 11/07/2019
-@update: 11/16/2019
+@update: 11/17/2019
 '''''''''
 import numpy as np
 import sympy

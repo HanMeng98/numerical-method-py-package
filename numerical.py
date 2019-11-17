@@ -24,6 +24,7 @@ def newtonMethod(start_point, var, f, epoch = 0, TOL = -1):
     p = []
     p.append(start_point)
     df = sympy.diff(f, var)
+    print(df)
     if epoch != 0 and TOL != -1:
         case = 0
     elif epoch != 0 and TOL == -1:
@@ -36,8 +37,8 @@ def newtonMethod(start_point, var, f, epoch = 0, TOL = -1):
     # Case 0, choose epoch and tolerance to be the ending condition
     if case == 0:
         for i in range(epoch):
-            assert df.subs(var,p[i]) != 0, "DENOMINATOR CANNOT BE 0!"
-            p_tmp = p[i] - f.subs(var, p[i]) / df.subs(var, p[i])
+            assert float(df.subs(var,p[i])) != 0, "DENOMINATOR CANNOT BE 0!"
+            p_tmp = p[i] - float(f.subs(var, p[i])) / float(df.subs(var, p[i]))
             p.append(p_tmp)
             if abs(p[-1]-p[-2]) < TOL:
                 print("Iteration finished ahead of epoches.")
@@ -46,20 +47,20 @@ def newtonMethod(start_point, var, f, epoch = 0, TOL = -1):
     # Case 1, choose epoch to be the ending condition
     if case == 1:
         for i in range(epoch):
-            assert df.subs(var,p[i]) != 0, "DENOMINATOR CANNOT BE 0!"
-            p_tmp = p[i] - f.subs(var, p[i]) / df.subs(var, p[i])
+            assert float(df.subs(var,p[i])) != 0, "DENOMINATOR CANNOT BE 0!"
+            p_tmp = p[i] - float(f.subs(var, p[i]) / df.subs(var, p[i]))
             p.append(p_tmp)
     
     # Case 2, choose tolerance to be the ending condition
     if case == 2:
-        assert df.subs(var, p[-1]) != 0, "DENOMINATOR CANNOT BE 0!"
-        p.append(p[-1] - f.subs(var, p[-1]) / df.subs(var, p[-1]))
+        assert float(df.subs(var, p[-1])) != 0, "DENOMINATOR CANNOT BE 0!"
+        p.append(p[-1] - float(f.subs(var, p[-1]) / df.subs(var, p[-1])))
         while(abs(p[-1] - p[-2]) > TOL):
-            assert df.subs(var, p[-1]) != 0, "DENOMINATOR CANNOT BE 0!"
-            p_tmp = p[-1] - f.subs(var, p[-1]) / df.subs(var, p[-1])
+            assert float(df.subs(var, p[-1])) != 0, "DENOMINATOR CANNOT BE 0!"
+            p_tmp = p[-1] - float(f.subs(var, p[-1]) / df.subs(var, p[-1]))
             p.append(p_tmp)
+    
     return p
-
 '''''''''
 Secant Method is used to find the root of f(x)=0
 coeffs: 

@@ -248,3 +248,40 @@ def rk4IVP(func, step, start_point, final_point, y0):
         y_next = y_list[i] + step*(K1+2*K2+2*K3+K4)/6
         y_list.append(y_next)
     return y_list
+
+'''''''''
+The function getStandardMatrix() is used to transform any matrix to an upper triangle matrix.
+coeffs: 
+    - matrix       - any matrix to be transformed
+returns:
+    - M            - the upper triangle matrix after transformation
+'''''''''
+def getStandardMatrix(matrix):
+    M = np.copy(matrix)
+    N = len(M)
+    for i in range(N):
+        for j in range(i+1,N):
+            M[j] = M[j] - (M[j,i]/M[i,i])*M[i]
+    return M
+
+'''''''''
+Gauss elimination is used to solve linear equations. (should be written in matrix format)
+The format is A * x = b
+coeffs: 
+    - matrix       - coefficients' matrix of the equations
+    - b            - right-value's vector of the equation
+returns:
+    - root         - np.ndarray of the root (vector x)
+'''''''''
+def gaussElim(matrix, b):
+    M_original = np.c_[matrix, b]
+    M_standard = getStandardMatrix(M_original)
+    N = len(M_standard)
+    root=np.zeros((N,1))
+    for i in range(N-1,-1,-1):
+        sum = 0
+        for j in range(i+1,N):
+            sum += root[j]*M_standard[i,j]
+        root[i]= (M_standard[i,-1] - sum) / M_standard[i,i]        
+    root = np.around(root,decimals=16)
+    return root

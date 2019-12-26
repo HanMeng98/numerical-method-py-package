@@ -4,7 +4,7 @@
 @contact: HanMeng98@outlook.com
 @file: numerical.py 
 @time: 11/07/2019
-@update: 11/17/2019
+@update: 12/26/2019
 '''''''''
 import numpy as np
 import sympy
@@ -285,3 +285,66 @@ def gaussElim(matrix, b):
         root[i]= (M_standard[i,-1] - sum) / M_standard[i,i]        
     root = np.around(root,decimals=16)
     return root
+
+################################################
+####    Solve eigenvalues and eigenvectors
+################################################
+'''''''''
+Power method is used to solve the dominant eigenvalue.
+coeffs: 
+    - matrix       - any matrix to be calculated
+    - x0           - an initial guess vector
+    - N            - iteration epoches
+    - TOL          - tolerance for the result
+returns:
+    - lam          - dominant eigenvalue of the inputted matrix
+'''''''''
+def powerMethod(matrix, x0, epoch = 0, TOL = -1):
+    A = np.copy(matrix)
+    y = np.dot(A,x0)
+    x = np.copy(x0)
+    count = 0
+    while True:
+        x_next = y/(np.sqrt(np.dot(y.T,y)))
+        lam = np.dot(x.T, y)
+        x = np.copy(x_next)
+        y = A*x
+        count += 1
+        eps = np.linalg.norm(x_next-x, ord=np.inf)
+        if count == epoch or eps < TOL:
+            break
+    return lam
+
+'''''''''
+Gauss Seidel iteration method is used to solve the dominant eigenvector
+coeffs: 
+    - matrix       - any matrix to be calculated
+    - x0           - an initial guess vector
+    - N            - iteration epoches
+    - TOL          - tolerance for the result
+returns:
+    - lam          - dominant eigenvalue of the inputted matrix
+'''''''''
+def gaussSeidel(matrix, b, x, N=-1, TOL = 1e-4):
+    n = len(b)
+    count = 0
+    x_next = np.copy(x)
+    eps = np.linalg.norm(x_next-x, ord=np.inf)
+    while True:
+        for i in range (n):
+            sum  = 0
+            for j in range(n):
+                if j != i:
+                    sum = sum + matrix[i,j]*x_next[j]
+            x_next[i] = (b[i] - sum)/matrix[i,i]
+        count += 1
+        eps = np.linalg.norm(x_next-x, ord=np.inf)
+        x = np.copy(x_next)
+        if eps >= 1e4:
+            print("The solution is diverging.")
+            break
+        if count == N or eps < TOL:
+            print("Iteration num:", count)
+            print("Quantity:{0:.4f}".format(eps))
+            break
+    return x
